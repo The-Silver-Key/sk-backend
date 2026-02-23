@@ -1,0 +1,24 @@
+{
+  "name": "the-silver-key",
+  "version": "1.0.0",
+  "description": "Non-custodial inheritance protocol for Solana. Protect your digital wealth across generations.",
+  "homepage": "https://github.com/The-Silver-Key/sk-backend#readme",
+  "bugs": {
+    "url": "https://github.com/The-Silver-Key/sk-backend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/The-Silver-Key/sk-backend.git"
+  },
+  "license": "ISC",
+  "author": "Nnaemeka Umeh",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  }
+}
