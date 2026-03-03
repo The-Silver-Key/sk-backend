@@ -5,9 +5,6 @@ const pool = require('../db')
 const router = express.Router()
 
 router.post('/signup', authController.signup)
-
-router.post('/login', async (req, res) => {
-    res.send("Login route")
-})
+router.post('/login', authController.login)
 
 module.exports = router;
