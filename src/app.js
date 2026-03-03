@@ -20,15 +20,15 @@ app.post('/wallet/delete', async (req, res) => {
     res.send("Wallet delete route")
 })
 
-app.all('*', (req, res, next) => {
+app.all('*path', (req, res, next) => {
     res.status(404).json({
         status: 'fail',
         message: `Cannot find path ${req.originalUrl} in this server`
     });
 })
 
-app.use(globalErrorHandler);
-app.use
+//app.use(globalErrorHandler);
+//app.use
 
 app.listen(3000, () => console.log("Server running on 3000")
 )

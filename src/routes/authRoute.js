@@ -4,12 +4,7 @@ const pool = require('../db')
 
 const router = express.Router()
 
-router.ppst('/signup', async (req, res) => {
-    res.send("Signup route")
-
-    const result = await pool.query(`INSERT INTO users (email, password) VALUES ('rddfed', 'password')`)
-    console.log("result: ", result);
-})
+router.post('/signup', authController.signup)
 
 router.post('/login', async (req, res) => {
     res.send("Login route")
