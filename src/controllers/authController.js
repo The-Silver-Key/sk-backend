@@ -6,7 +6,7 @@ const crypto = require('crypto')
 exports.signup = async (req, res) => {
 
     try {
-        const { email, password } = req.body
+        const { email, password, name } = req.body
         if(!email || !password) {
             return res.status(400).send("Please enter email and password")
         }
@@ -14,7 +14,7 @@ exports.signup = async (req, res) => {
         //hash password before storing in db (for security reasons)
         const hashedPassword = await bcrypt.hash(password, 10)
         
-        const result = await pool.query(`INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id`, [email, hashedPassword])
+        const result = await pool.query(`INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id`, [email, hashedPassword, name || null])
         console.log("result: ", result);
 
         const token = jwt.sign({ userId: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '12h' })
