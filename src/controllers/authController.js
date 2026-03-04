@@ -76,8 +76,13 @@ exports.forgotPassword = async (req, res) => {
     const passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
 
     //save the hashed token to db
-    const result = await pool.query(`INSERT into users (passwordResetToken, passwordResetExpires)VALUES ($1 $2)`, [passwordResetToken, Date.now() + 10 * 60 * 1000])
+    const result = await pool.query(`UPDATE users SET passwordResetToken = $1, passwordResetExpires = $2 WHERE email = $3 RETURNING *`, [passwordResetToken, new Date(Date.now() + 10 * 60 * 1000), req.body.email])
     console.log("resetResult: ", result);
+    res.status(200).json({
+        status: "success",
+        message: "Password reset token generated and saved to db",
+        token: token
+    })
     
 }
 
