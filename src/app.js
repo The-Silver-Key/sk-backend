@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 const pool = require('./db')
 const authRoute = require('./routes/authRoute')
 const walletRoute = require('./routes/walletRoute')
+const userRoute = require('./routes/userRoute')
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(express.json())
 
 app.use('/auth', authRoute)
 app.use('/wallet', walletRoute)
+app.use('/users', userRoute)
 
 app.post('/wallet/add', async (req, res) => {
     res.send("Wallet route")

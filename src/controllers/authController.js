@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const pool = require('../db')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
 
 exports.signup = async (req, res) => {
 
@@ -49,8 +50,8 @@ exports.login = async (req, res) => {
             return res.status(401).send("Invalid email or password")
         }
 
-        //3.) return token to the user
-        const token = jwt.sign({ userId: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '12h' })
+        //3.) generate token and return token to the user
+        const token = jwt.sign({ userId: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' })
         res.status(200).json({
             status: 'success',
             token: token
@@ -58,4 +59,63 @@ exports.login = async (req, res) => {
     } catch (error) {
         
     }
+}
+
+exports.forgotPassword = async (req, res) => {
+    //get user from db
+    const userResult = await pool.query(`SELECT * FROM users WHERE email = $1`, [req.body.email])
+    if(userResult.rows.length == 0) {
+        res.status(404).json({
+            status: "fail",
+            message: "There is no user with this email"
+        })
+    }
+
+    //generate random token
+    const token = crypto.randomBytes(32).toString('hex');
+    const passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    //save the hashed token to db
+    const result = await pool.query(`INSERT into users (passwordResetToken, passwordResetExpires)VALUES ($1 $2)`, [passwordResetToken, Date.now() + 10 * 60 * 1000])
+    console.log("resetResult: ", result);
+    
+}
+
+exports.protect = async (req, res, next) => {
+    let token;
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+    console.log("token: ", token);
+    
+ 
+    if (!token) {
+        res.status(401).json({
+            status: 'fail',
+            message: 'Auth token required!'
+        })
+    }
+
+    //verification of token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    console.log(decoded);
+    
+
+    next();
+
+    //check if user still exists in db (in case user is deleted after token is issued)
+    const userResult = await pool.query(`SELECT * FROM users WHERE id = $1`, [decoded.userId])
+
+    if(userResult.rows.length === 0) {
+        return res.status(401).json({
+            status: 'fail',
+            message: 'User no longer exists'
+        })
+    }
+
+    //check if user changed password
+    //TODO!
+
+    //TODO: add user info to req object and use it in the controllers
+    //TODO: add token expiration handling
 }
