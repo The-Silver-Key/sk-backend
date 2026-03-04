@@ -14,7 +14,7 @@ exports.signup = async (req, res) => {
         //hash password before storing in db (for security reasons)
         const hashedPassword = await bcrypt.hash(password, 10)
         
-        const result = await pool.query(`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id`, [email, hashedPassword])
+        const result = await pool.query(`INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id`, [email, hashedPassword])
         console.log("result: ", result);
 
         const token = jwt.sign({ userId: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '12h' })
@@ -83,6 +83,8 @@ exports.forgotPassword = async (req, res) => {
         message: "Password reset token generated and saved to db",
         token: token
     })
+
+    //TODO: Implement sending token to email using nodemailer etc.
     
 }
 
