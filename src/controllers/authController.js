@@ -67,7 +67,13 @@ exports.login = async (req, res) => {
         
         res.status(200).json({
             status: 'success',
-            token: token
+            token: token,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                created_at: user.created_at
+            }
         })
     } catch (error) {
         
@@ -110,7 +116,7 @@ exports.protect = async (req, res, next) => {
     
  
     if (!token) {
-        res.status(401).json({
+        return res.status(401).json({
             status: 'fail',
             message: 'Auth token required!'
         })
@@ -119,9 +125,6 @@ exports.protect = async (req, res, next) => {
     //verification of token
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     console.log(decoded);
-    
-
-    next();
 
     //check if user still exists in db (in case user is deleted after token is issued)
     const userResult = await pool.query(`SELECT * FROM users WHERE id = $1`, [decoded.userId])
@@ -138,4 +141,8 @@ exports.protect = async (req, res, next) => {
 
     //TODO: add user info to req object and use it in the controllers
     //TODO: add token expiration handling
+
+    req.user = userResult.rows[0];
+
+    next();
 }
