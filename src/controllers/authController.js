@@ -44,14 +44,24 @@ exports.login = async (req, res) => {
         //2.) check if email and password is correct from db
         const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [email])
         console.log(result);
-        
 
-        if(result.rows.length === 0 || !await bcrypt.compare(password, result.rows[0].password)) {
-            return res.status(401).send("Invalid email or password")
+        const user = result.rows[0];
+        console.log("user: ", user);
+        
+        
+        try {
+            if(result.rows.length === 0 || !await bcrypt.compare(password, user.password_hash)) {
+                return res.status(401).send("Invalid email or password")
+            }
+        } catch (error) {
+            console.log("password check error: ", error);
+            return res.status(500).send("Internal server error")
         }
 
         //3.) generate token and return token to the user
-        const token = jwt.sign({ userId: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+        console.log("token: ", token);
+        
         res.status(200).json({
             status: 'success',
             token: token
