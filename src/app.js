@@ -5,6 +5,7 @@ const pool = require('./db')
 const authRoute = require('./routes/authRoute')
 const walletRoute = require('./routes/walletRoute')
 const userRoute = require('./routes/userRoute')
+const estateRoute = require('./routes/estateRoute')
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(cors({
 app.use('/auth', authRoute)
 app.use('/wallet', walletRoute)
 app.use('/users', userRoute)
+app.use('/estate', estateRoute)
 
 app.post('/wallet/add', async (req, res) => {
     res.send("Wallet route")
