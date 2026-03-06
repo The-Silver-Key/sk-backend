@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('./../utils/jwt')
 const pool = require('../db')
 const bcrypt = require('bcryptjs')
 const crypto = require('crypto')
@@ -17,7 +17,9 @@ exports.signup = async (req, res) => {
         const result = await pool.query(`INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id`, [email, hashedPassword, name || null])
         console.log("result: ", result);
 
-        const token = jwt.sign({ userId: result.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '12h' })
+        const user = result.rows[0];
+
+        const token = jwt.generateToken(user.id)
 
         res.status(201).json({
             status: 'success',
@@ -62,7 +64,7 @@ exports.login = async (req, res) => {
         }
 
         //3.) generate token and return token to the user
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '12h' })
+        const token = jwt.generateToken(user.id)
         console.log("token: ", token);
         
         res.status(200).json({
@@ -107,42 +109,3 @@ exports.forgotPassword = async (req, res) => {
     
 }
 
-exports.protect = async (req, res, next) => {
-    let token;
-    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1];
-    }
-    console.log("token: ", token);
-    
- 
-    if (!token) {
-        return res.status(401).json({
-            status: 'fail',
-            message: 'Auth token required!'
-        })
-    }
-
-    //verification of token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    console.log(decoded);
-
-    //check if user still exists in db (in case user is deleted after token is issued)
-    const userResult = await pool.query(`SELECT * FROM users WHERE id = $1`, [decoded.userId])
-
-    if(userResult.rows.length === 0) {
-        return res.status(401).json({
-            status: 'fail',
-            message: 'User no longer exists'
-        })
-    }
-
-    //check if user changed password
-    //TODO!
-
-    //TODO: add user info to req object and use it in the controllers
-    //TODO: add token expiration handling
-
-    req.user = userResult.rows[0];
-
-    next();
-}
