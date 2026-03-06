@@ -1,7 +1,34 @@
-const pool = require('../db')
+const pool = require('../db');
+const { connect } = require('../routes/authRoute');
 
 exports.getWallets = async (req, res) => {
 
+    try {
+
+        const { id } = req.user;
+
+        const result = await pool.query(`SELECT * FROM user_wallets WHERE user_id = $1`, [id])
+        console.log("User wallets: ", result.rows);
+
+        const wallets = result.rows.map(row => ({
+            id: row.id,
+            adddress: row.wallet_address,
+            label: row.label,
+            isPrimary: row.is_Primary,
+            connectedAt: row.updated_at
+        }))
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Wallets fetched successfully',
+            data: {
+                wallets
+            }
+        })
+        
+    } catch (error) {
+
+    }
 }
 
 exports.addWallet = async (req, res) => {
