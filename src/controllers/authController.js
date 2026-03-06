@@ -17,9 +17,9 @@ exports.signup = async (req, res) => {
         const result = await pool.query(`INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id`, [email, hashedPassword, name || null])
         console.log("result: ", result);
 
-        const userId = result.rows[0].id;
+        const user = result.rows[0];
 
-        const token = jwt.generateToken(userId)
+        const token = jwt.generateToken(user.id)
 
         res.status(201).json({
             status: 'success',
@@ -64,7 +64,7 @@ exports.login = async (req, res) => {
         }
 
         //3.) generate token and return token to the user
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '12h' })
+        const token = jwt.generateToken(user.id)
         console.log("token: ", token);
         
         res.status(200).json({

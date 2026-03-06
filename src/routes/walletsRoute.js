@@ -1,7 +1,13 @@
 const express = require('express')
 const pool = require('../db')
+const { authenticate } = require('../middlewares/authenthicate')
+const walletsController = require('./../controllers/walletsController')
 
 const router = express.Router()
+
+router.route('/')
+    .get(authenticate, walletsController.getWallets)
+    .post(authenticate, walletsController.addWallet)
 
 router.post('/add', async (req, res) => {
     res.send("Wallet route")

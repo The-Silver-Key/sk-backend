@@ -3,7 +3,7 @@ const cors = require('cors')
 const dotenv = require('dotenv')
 const pool = require('./db')
 const authRoute = require('./routes/authRoute')
-const walletRoute = require('./routes/walletRoute')
+const walletRoute = require('./routes/walletsRoute')
 const userRoute = require('./routes/userRoute')
 const estateRoute = require('./routes/estateRoute')
 
@@ -28,7 +28,7 @@ app.use(cors({
 }))
 
 app.use('/auth', authRoute)
-app.use('/wallet', walletRoute)
+app.use('/wallets', walletRoute)
 app.use('/users', userRoute)
 app.use('/estate', estateRoute)
 
