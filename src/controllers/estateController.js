@@ -2,17 +2,25 @@ const pool = require('../db')
 
 exports.getEstate = async (req, res) => {
     //get estate from user
-
-    const userId = req.user.id
-
-    const result = await pool.query(`SELECT * FROM estates WHERE user_id = $1 AND is_active = TRUE`, [userId])
-    
-    res.status(200).json({
-        status: 'success',
-        data: {
-            estate: result.rows
-        }
-    })
+    try {
+        
+        const userId = req.user.id
+        
+        const result = await pool.query(`SELECT * FROM estates WHERE user_id = $1 AND is_active = TRUE`, [userId])
+            
+        res.status(200).json({
+            status: 'success',
+            data: {
+                estate: result.rows
+            }
+        })
+    } catch (error) {
+        console.log("Error: ", error);
+        res.status(500).json({
+            status: 'fail',
+            message: 'An error occurred while fetching the estate'
+        })
+    }
     
 }
 
@@ -105,6 +113,9 @@ exports.createEstate = async (req, res) => {
         
     } catch (error) {
         console.log("Error: ", error);
-        res.status(500).send("Internal server error")
+        res.status(500).json({
+            status: 'fail',
+            message: 'An error occurred while creating the estate'
+        })
     }
 }
