@@ -72,5 +72,22 @@ exports.updateBeneficiary = async (req, res) => {
 
 exports.deleteBeneficiary = async (req, res) => {
 
+    const id = req.params.id;
+
+    const result = await pool.query(`DELETE FROM beneficiaries WHERE id = $1 RETURNING *`, [id])
+
+    console.log("Deleted beneficiary data: ", result.rows);
+
+    if (!result.rows[0]) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Beneficiary not found'
+        })
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Beneficiary deleted successfully'
+    });
 
 }
