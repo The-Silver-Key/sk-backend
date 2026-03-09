@@ -12,9 +12,9 @@ exports.getWallets = async (req, res) => {
 
         const wallets = result.rows.map(row => ({
             id: row.id,
-            adddress: row.wallet_address,
+            address: row.wallet_address,
             label: row.label,
-            isPrimary: row.is_Primary,
+            isPrimary: row.is_primary,
             connectedAt: row.updated_at
         }))
 
@@ -35,6 +35,8 @@ exports.addWallet = async (req, res) => {
     try {
         const { id } = req.user;
         const chain = 'ethereum';
+
+        console.log("req.body: ", req.body);
         
     
         const result = await pool.query(`INSERT into user_wallets (user_id, wallet_address, chain, is_primary, label) 

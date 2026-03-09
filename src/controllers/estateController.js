@@ -8,12 +8,80 @@ exports.getEstate = async (req, res) => {
         
         const result = await pool.query(`SELECT * FROM estates WHERE user_id = $1 AND is_active = TRUE`, [userId])
             
+        const resultEstate = result.rows[0];
+
+        if (!resultEstate) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'No active estate found for this user'
+            })
+        }
+
+        //get all the reminder schedules for the estate
+        const reminderResult = await pool.query(`SELECT * FROM estate_reminder_schedules WHERE estate_id = $1`, [resultEstate.id])
+        const reminders = reminderResult.rows.map(row => row.schedule);
+
+        if (reminders.length === 0) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'No reminder schedules found for this estate'
+            })
+        }
+
+        //get all the beneficairies for the estate
+        const beneficiaryResult = await pool.query(`SELECT * FROM beneficiaries WHERE estate_id = $1`, [resultEstate.id])
+        console.log("Estate beneficiaries Result: ", beneficiaryResult.rows);
+        //const beneficiaries = beneficiaryResult.rows;
+
+        //read more about this logic. it changes ame of allocation and wallet fields to match FE format
+        const beneficiaries = beneficiaryResult.rows.map(({ allocation_percent, wallet_address, ...rest }) => ({
+            ...rest,
+            allocation: allocation_percent,
+            walletAddress: wallet_address,
+        }));
+
+        
+        const Estate = {
+            id: resultEstate.id,
+            userId: resultEstate.user_id,
+            name: resultEstate.estate_name,
+            primaryEmail: resultEstate.primary_contact_email,
+            emergencyContact: {
+                name: resultEstate.emergency_contact_name,
+                email: resultEstate.emergency_contact_email,
+                phone: resultEstate.emergency_contact_phone,
+            },
+            heartbeat: {
+                frequency: resultEstate.heartbeat_frequency, // months
+                gracePeriod: resultEstate.grace_period_days, // days
+                reminders, // reminder_schedule[],
+                lastCheckin: resultEstate.last_heartbeat_at,
+                nextDeadline: resultEstate.next_heartbeat_due_at,
+            },
+            security: {
+                requireMFA: resultEstate.require_mfa,
+                highValueThreshold: resultEstate.high_value_threshold,
+                waitingPeriod: resultEstate.waiting_period_days, // days
+                trustedContacts: [],
+            },
+            wallets: [],
+            beneficiaries,
+            status: 'active',
+            createdAt: resultEstate.created_at,
+            updatedAt: resultEstate.updated_at,
+        }
+        
         res.status(200).json({
             status: 'success',
             data: {
-                estate: result.rows
+                estate: Estate
             }
         })
+        
+        
+
+        console.log("Estate result: ", result.rows);
+        
     } catch (error) {
         console.log("Error: ", error);
         res.status(500).json({
@@ -66,6 +134,7 @@ exports.createEstate = async (req, res) => {
         }
         //const reminderResult = await pool.query(`INSERT INTO estate_reminder_schedules (estate_id, schedule) VALUES ($1, $2)`, [resultEstate.id, estate.reminder_schedule])
         
+        //TODO: Extract into seperate function and call in getEstate as well
         //get all the reminder schedules for the estate
         const reminderResult = await pool.query(`SELECT * FROM estate_reminder_schedules WHERE estate_id = $1`, [resultEstate.id])
         const reminders = reminderResult.rows.map(row => row.schedule);
