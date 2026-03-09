@@ -27,6 +27,19 @@ exports.getEstate = async (req, res) => {
                 message: 'No reminder schedules found for this estate'
             })
         }
+
+        //get all the beneficairies for the estate
+        const beneficiaryResult = await pool.query(`SELECT * FROM beneficiaries WHERE estate_id = $1`, [resultEstate.id])
+        console.log("Estate beneficiaries Result: ", beneficiaryResult.rows);
+        //const beneficiaries = beneficiaryResult.rows;
+
+        //read more about this logic. it changes ame of allocation and wallet fields to match FE format
+        const beneficiaries = beneficiaryResult.rows.map(({ allocation_percent, wallet_address, ...rest }) => ({
+            ...rest,
+            allocation: allocation_percent,
+            walletAddress: wallet_address,
+        }));
+
         
         const Estate = {
             id: resultEstate.id,
@@ -52,7 +65,7 @@ exports.getEstate = async (req, res) => {
                 trustedContacts: [],
             },
             wallets: [],
-            beneficiaries: [],
+            beneficiaries,
             status: 'active',
             createdAt: resultEstate.created_at,
             updatedAt: resultEstate.updated_at,

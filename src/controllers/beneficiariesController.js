@@ -23,17 +23,54 @@ exports.addBeneficiary = async (req, res) => {
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
         [estate.id, beneficiaryData.name, beneficiaryData.email, beneficiaryData.walletAddress, beneficiaryData.relationship, beneficiaryData.allocation, beneficiaryData.notificationEnabled])
 
-    const Beneficiary = {
-        
+    const resultBeneficiary = result.rows[0];
+
+    const beneficiary = {
+        id: resultBeneficiary.id,
+        name: resultBeneficiary.name,
+        email: resultBeneficiary.email,
+        walletAddress: resultBeneficiary.wallet_address,
+        relationship: resultBeneficiary.relationship,
+        allocation: resultBeneficiary.allocation_percent,
+        notificationEnabled: resultBeneficiary.enable_notifications,
+        createdAt: resultBeneficiary.created_at
     }
     
-        res.status(201).json(result.rows[0])
+        res.status(201).json({
+            status: 'success',
+            message: 'Beneficiary added successfully',
+            data: {
+                beneficiary
+            }
+        })
 }
 
 exports.updateBeneficiary = async (req, res) => {
-    res.send("Working update beneficiary route")
+        
+    const { name, email, allocation, relationship} = req.body
+    const id = req.params.id
+
+    const result = await pool.query(`UPDATE beneficiaries 
+        SET name = $1, email = $2, allocation_percent = $3, relationship = $4 
+        WHERE id = $5 
+        RETURNING *`, 
+        [name, email, allocation, relationship, req.params.id])
+
+    console.log("Updated beneficiary data: ", result.rows);
+
+    const beneficiary = result.rows[0];
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Beneficiary updated successfully',
+        data: {
+            beneficiary
+        }
+    })
+
 }
 
 exports.deleteBeneficiary = async (req, res) => {
-    res.send("Working delete beneficiary route")
+
+
 }

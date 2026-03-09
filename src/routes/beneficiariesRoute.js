@@ -6,8 +6,10 @@ const router = express.Router()
 
 router.route('/')
     .get(authenticate, beneficiariesController.getBeneficiaries)
-    .post(authenticate, beneficiariesController.addBeneficiary)
-    .put(authenticate, beneficiariesController.updateBeneficiary)
+    .post(authenticate, beneficiariesController.addBeneficiary);
+
+router.route('/:id')
+    .patch(authenticate, beneficiariesController.updateBeneficiary)
     .delete(authenticate, beneficiariesController.deleteBeneficiary)
 
 module.exports = router;
