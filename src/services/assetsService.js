@@ -14,7 +14,35 @@ exports.getAllTokens = async (userWalletAddress, chain) => {
         }
     })
 
-    console.log("Result tokens: ", result);
+    console.log("Result tokens: ", result.data);
     
-    return result;
+    
+    const Assets = [
+        {
+            id: 1,
+            walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
+            symbol: "USDT",
+            name: "Tether",
+            balance: 1000,
+            allowance: 1000,
+            usdValue: 1000,
+            type: 'token',
+            lastUpdated: new Date().toISOString()
+        },
+        {
+            id: 2,
+            walletAddress: "0x2324567890abcdef1234567890abcdef12345678",
+            symbol: "MEME",
+            name: "Memecoin",
+            balance: 3200,
+            allowance: 1000,
+            usdValue: 3000,
+            type: 'token',
+            lastUpdated: new Date().toISOString()
+        }
+    ]
+
+    //return result.data;
+    return Assets;
+
 }
