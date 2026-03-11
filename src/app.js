@@ -9,6 +9,7 @@ const userRoute = require('./routes/userRoute')
 const estateRoute = require('./routes/estateRoute')
 const beneficiariesRoute = require('./routes/beneficiariesRoute')
 const assetsRoute = require('./routes/assetsRoute')
+const webhooksRoute = require('./routes/webhooksRoutes')
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/users', userRoute)
 app.use('/estate', estateRoute)
 app.use('/beneficiaries', beneficiariesRoute)
 app.use('/assets', assetsRoute)
+app.use('/webhooks', webhooksRoute)
 
 app.all('*path', (req, res, next) => {
     res.status(404).json({
