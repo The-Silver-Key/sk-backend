@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv')
 const pool = require('./db')
+const moralis = require('./utils/moralis')
 const authRoute = require('./routes/authRoute')
 const walletRoute = require('./routes/walletsRoute')
 const userRoute = require('./routes/userRoute')
@@ -12,6 +13,9 @@ const assetsRoute = require('./routes/assetsRoute')
 const app = express();
 
 app.use(express.json())
+
+//init moralis stream
+await moralis.initMoralis()
 
 const allowedOrigins = [
     'http://localhost:3000',
