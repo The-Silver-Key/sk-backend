@@ -16,7 +16,7 @@ exports.startStream = async () => {
             chains: [0x1], //Eth mainnet
             tag: "The Silver Key Approval Stream",
             description: "Stream to listen for approval events on contract addresses",
-            webhookUrl: "https://thesilverkey-backend.onrender.com/webhooks/moralis",
+            webhookUrl: "https://the-silver-key.onrender.com/webhooks/moralis",
             includeContractLogs: true,
             abi: [
                 {
