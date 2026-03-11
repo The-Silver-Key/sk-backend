@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv')
 const pool = require('./db')
+const moralis = require('./utils/moralis')
 const authRoute = require('./routes/authRoute')
 const walletRoute = require('./routes/walletsRoute')
 const userRoute = require('./routes/userRoute')
@@ -46,5 +47,14 @@ app.all('*path', (req, res, next) => {
 //app.use(globalErrorHandler);
 //app.use
 
-app.listen(3000, () => console.log("Server running on 3000")
-)
+const start = async () => {
+
+    // await moralis.initMoralis();
+    // await moralis.startStream();
+    //TODO: Hanlde 'on server crash' to delete stream. so that multiple streams are not created.
+
+
+    app.listen(3000, () => console.log("Server running on 3000"));
+};
+
+start();

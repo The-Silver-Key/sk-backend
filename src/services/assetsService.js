@@ -42,6 +42,8 @@ exports.getAllTokens = async (userWalletAddress, chain) => {
         }
     ]
 
+    const newAssets = Assets.map(el => ({...el, walletAddress: "9d9d9dd9"}))
+
     //return result.data;
     return Assets;
 
