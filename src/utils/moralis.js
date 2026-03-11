@@ -11,29 +11,35 @@ exports.initMoralis = async () => {
 
 exports.startStream = async () => {
 
-    const streamDetails = {
-        chains: [0x1], //Eth mainnet
-        tag: "The Silver Key Approval Stream",
-        description: "Stream to listen for approval events on contract addresses",
-        webhookUrl: "https://thesilverkey-backend.onrender.com/webhooks/moralis",
-        includeContractLogs: true,
-        abi: [
-            {
-                anonymous: false,
-                inputs: [
-                {indexed: true, name: "owner", type: "address"},
-                {indexed: true, name: "spender", type: "address"},
-                {indexed: false, name: "value", type: "uint256"}
-                ],
-                name: "Approval",
-                type: "event"
-                }
-        ]
+    try {
+        const streamDetails = {
+            chains: [0x1], //Eth mainnet
+            tag: "The Silver Key Approval Stream",
+            description: "Stream to listen for approval events on contract addresses",
+            webhookUrl: "https://thesilverkey-backend.onrender.com/webhooks/moralis",
+            includeContractLogs: true,
+            abi: [
+                {
+                    anonymous: false,
+                    inputs: [
+                    {indexed: true, name: "owner", type: "address"},
+                    {indexed: true, name: "spender", type: "address"},
+                    {indexed: false, name: "value", type: "uint256"}
+                    ],
+                    name: "Approval",
+                    type: "event"
+                    }
+            ],
+            topic0: ['Approval(address,address,uint256)']
+        }
+    
+        const stream = await Moralis.Streams.add(streamDetails);
+    
+        console.log("Stream Result: ", stream.data.status);
+    } catch (error) {
+        console.log("Error: ", error);
+        
     }
-
-    const stream = await Moralis.Streams.add(streamDetails);
-
-    console.log("Stream Result: ", stream);
     
     
 }

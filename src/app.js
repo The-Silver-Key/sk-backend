@@ -14,9 +14,6 @@ const app = express();
 
 app.use(express.json())
 
-//init moralis stream
-await moralis.initMoralis()
-
 const allowedOrigins = [
     'http://localhost:3000',
     'https://thesilverkey.lovable.app',
@@ -50,5 +47,14 @@ app.all('*path', (req, res, next) => {
 //app.use(globalErrorHandler);
 //app.use
 
-app.listen(3000, () => console.log("Server running on 3000")
-)
+const start = async () => {
+
+    // await moralis.initMoralis();
+    // await moralis.startStream();
+    //TODO: Hanlde 'on server crash' to delete stream. so that multiple streams are not created.
+
+
+    app.listen(3000, () => console.log("Server running on 3000"));
+};
+
+start();
