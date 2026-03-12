@@ -14,7 +14,31 @@ exports.getAllTokens = async (userWalletAddress, chain) => {
         }
     })
 
+    //Get tokens from database for the user and merge with moralis data to get allowance and other details.
+
+
+
+    
     console.log("Result tokens: ", result.data);
+
+    const tokens = result.data.result;
+
+    for (let index = 0; index < tokens.length; index++) {
+        const token = tokens[index];
+
+        let asset = {
+            id: 1,
+            walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
+            symbol: "USDT",
+            name: "Tether",
+            balance: 1000,
+            allowance: 1000,
+            usdValue: 1000,
+            type: 'token',
+            lastUpdated: new Date().toISOString()
+        }
+        
+    }
     
     
     const Assets = [
