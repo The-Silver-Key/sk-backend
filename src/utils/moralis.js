@@ -9,7 +9,7 @@ exports.initMoralis = async () => {
     });
 }
 
-exports.startStream = async () => {
+exports.createStream = async () => {
 
     try {
         const streamDetails = {
@@ -35,11 +35,39 @@ exports.startStream = async () => {
     
         const stream = await Moralis.Streams.add(streamDetails);
     
-        console.log("Stream Result: ", stream.data.status);
+        console.log("Stream Result: ", stream);
     } catch (error) {
         console.log("Error: ", error);
         
     }
     
     
+}
+
+exports.getAllStreams = async () => {
+
+    try {
+        const streams = await Moralis.Streams.getAll({
+            limit: 100
+        });
+        console.log("All Streams: ", streams.jsonResponse.result);
+        
+    } catch (error) {
+
+        console.log("Error getting streams: ", error);
+        
+    }
+}
+
+exports.deleteStream = async (id) => {
+
+    try {
+        const result = await Moralis.Streams.delete({
+            id
+        })
+    } catch (error) {
+        console.log("There was an error deleting the stream: ", error);
+        
+    }
+
 }

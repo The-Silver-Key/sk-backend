@@ -51,8 +51,11 @@ app.all('*path', (req, res, next) => {
 
 const start = async () => {
 
-    // await moralis.initMoralis();
-    // await moralis.startStream();
+    await moralis.initMoralis();
+    //await moralis.createStream();
+
+    await moralis.getAllStreams();
+    //await moralis.deleteStream("d42d887f-6446-4756-ade2-45a70a01a0ed")
     //TODO: Hanlde 'on server crash' to delete stream. so that multiple streams are not created.
 
 
