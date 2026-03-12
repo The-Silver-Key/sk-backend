@@ -3,7 +3,7 @@ const pool = require('./../db');
 const { v4: uuidv4 } = require('uuid')
 const { ethers } = require('ethers')
 
-exports.getAllTokens = async (userWalletAddresses, chain) => {
+exports.getAllTokens = async (userId, userWalletAddresses, chain) => {
 
     const moralisApiKey = process.env.MORALIS_API_KEY;
 
@@ -18,16 +18,20 @@ exports.getAllTokens = async (userWalletAddresses, chain) => {
 
         const tokens = result.data.result; //array containing all users tokens
 
+        console.log("Tokens: ", tokens);
+        
+
         //loop tokens array and create object for each item with defined fields.
         return tokens.map(token => ({
-            id: uuidv4(),
+            id: null,
             walletAddress, // uses the current wallet address in the loop
             symbol: token.symbol,
             name: token.name,
             balance: ethers.utils.formatUnits(token.balance, token.decimals),
-            allowance: 1000,
+            allowance: 0,
             usdValue: token.usd_value,
             type: 'token',
+            chain: "ethereum",
             lastUpdated: new Date().toISOString()
         }));
         })
@@ -37,8 +41,25 @@ exports.getAllTokens = async (userWalletAddresses, chain) => {
     const Assets = results.flat();        
 
     //TODO: Get assets from database for the user and merge with moralis data to get allowance and other details.
+    const assetResult = await pool.query(`SELECT a.* FROM assets a 
+        JOIN user_wallets w ON w.id = a.user_wallet_id 
+        WHERE w.user_id = $1`, [userId]);
 
-    return Assets;
+    const databaseAssets = assetResult.rows;
+
+    //check if assets are in asset table and merge them to Assets array wth their allowance and id
+    const userAssets = Assets.map(asset => { 
+        let dbAsset = databaseAssets.find(
+            r => (r.token_address == asset.token_address) && (r.chain == asset.chain)
+        );
+
+        //if dbAsset exists (asset has been granted allowance previously hence its in db; it adds allowance and ID)
+        return {...asset, allowance: dbAsset?.allowance ?? 0, id: dbAsset?.id ?? uuidv4(), }
+    })
+
+
+
+    return userAssets;
 };
 
 // exports.getAllTokens = async (userWalletAddress, chain) => {
