@@ -9,16 +9,7 @@ router.route('/')
     .get(authenticate, walletsController.getWallets)
     .post(authenticate, walletsController.addWallet)
 
-router.post('/add', async (req, res) => {
-    res.send("Wallet route")
-
-    const userId = 'user id here';
-
-    const result = await pool.query(`INSERT INTO user_wallets ()`)
-})
-
-router.post('/delete', async (req, res) => {
-    res.send("Wallet delete route")
-})
+router.route('/:id')
+    .delete(authenticate, walletsController.deleteWallet)
 
 module.exports = router;
