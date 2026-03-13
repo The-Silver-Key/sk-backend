@@ -27,6 +27,7 @@ exports.getAllTokens = async (userId, userWalletAddresses, chain) => {
             walletAddress, // uses the current wallet address in the loop
             symbol: token.symbol,
             name: token.name,
+            tokenAddress: token.token_address,
             balance: ethers.utils.formatUnits(token.balance, token.decimals),
             allowance: 0,
             usdValue: token.usd_value,
