@@ -40,6 +40,10 @@ exports.getAllTokens = async (userId, userWalletAddresses, chain) => {
 
     // flatten since each wallet returns an array of tokens
     const Assets = results.flat();        
+    
+    //Get all user's wallets
+    const walletsResult = await pool.query(`SELECT * FROM user_wallets WHERE user_id = $1`, [userId]);
+    const databaseWallets = walletsResult.rows;
 
     //TODO: Get assets from database for the user and merge with moralis data to get allowance and other details.
     const assetResult = await pool.query(`SELECT a.* FROM assets a 
@@ -50,15 +54,20 @@ exports.getAllTokens = async (userId, userWalletAddresses, chain) => {
 
     //check if assets are in asset table and merge them to Assets array wth their allowance and id
     const userAssets = Assets.map(asset => { 
+        // First find the wallet record that matches this asset's walletAddress
+        const wallet = databaseWallets.find(
+            dW => dW.wallet_address.toLowerCase() === asset.walletAddress.toLowerCase()
+        );
+
         let dbAsset = databaseAssets.find(
-            r => (r.token_address == asset.tokenAddress) && (r.chain == asset.chain)
+            dA => (dA.token_address == asset.tokenAddress) && (dA.chain == asset.chain) && (dA.user_wallet_id == wallet.id)
         );
 
         //if dbAsset exists (asset has been granted allowance previously hence its in db; it adds allowance and ID)
         return {...asset, allowance: dbAsset?.allowance ?? 0, id: dbAsset?.id ?? uuidv4(), }
     })
 
-
+    
 
     return userAssets;
 };
