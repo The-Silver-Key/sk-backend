@@ -53,3 +53,22 @@ exports.addWallet = async (req, res) => {
     }   
 
 }
+
+exports.deleteWallet = async (req, res) => {
+
+    const walletId = req.params.id
+    
+    try {
+        
+        const result = await pool.query(`DELETE FROM user_wallets WHERE id = $1`, [walletId])
+                
+        res.status(204).send();
+
+    } catch (error) {
+        console.log("Error deleting wallet: ", error);
+        res.status(404).json({
+            status: 'fail',
+            message: "User wallet not found"
+        });        
+    }
+}
