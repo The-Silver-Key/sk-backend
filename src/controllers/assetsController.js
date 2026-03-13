@@ -22,7 +22,8 @@ exports.getAssets = async (req, res) => {
 
 exports.addAsset = async (req, res) => {
     try {
-    const { walletAddress, name, tokenAddress, chain, allowance, balance } = req.body
+    const { asset, allowance } = req.body
+    const { walletAddress, name, tokenAddress, chain, balance } = asset
     const userId = req.user.id
 
     // Get the wallet id, also verify the wallet belongs to the authenticated user

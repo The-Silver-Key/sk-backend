@@ -51,7 +51,7 @@ exports.getAllTokens = async (userId, userWalletAddresses, chain) => {
     //check if assets are in asset table and merge them to Assets array wth their allowance and id
     const userAssets = Assets.map(asset => { 
         let dbAsset = databaseAssets.find(
-            r => (r.token_address == asset.token_address) && (r.chain == asset.chain)
+            r => (r.token_address == asset.tokenAddress) && (r.chain == asset.chain)
         );
 
         //if dbAsset exists (asset has been granted allowance previously hence its in db; it adds allowance and ID)
